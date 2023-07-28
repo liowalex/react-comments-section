@@ -43,7 +43,7 @@ const InputField = ({
 
   const globalStore: any = useContext(GlobalContext)
 
-  const editMode = async (advText?: string) => {
+  const editMode = async (advText?: string, data?: {name:string, email: string, message: string}) => {
     const textToSend = advText ? advText : text
 
     return (
@@ -58,12 +58,13 @@ const InputField = ({
             : null,
           fullName: globalStore.currentUserData.currentUserFullName,
           text: textToSend,
+          data: data,
           parentOfEditedCommentId: parentId
         }))
     )
   }
 
-  const replyMode = async (replyUuid: string, advText?: string) => {
+  const replyMode = async (replyUuid: string, advText?: string, data?: {name:string, email: string, message: string}) => {
     const textToSend = advText ? advText : text
 
     return (
@@ -78,12 +79,13 @@ const InputField = ({
             : null,
           fullName: globalStore.currentUserData.currentUserFullName,
           text: textToSend,
+          data: data,
           parentOfRepliedCommentId: parentId,
           comId: replyUuid
         }))
     )
   }
-  const submitMode = async (createUuid: string, advText?: string) => {
+  const submitMode = async (createUuid: string, advText?: string, data?: {name:string, email: string, message: string}) => {
     const textToSend = advText ? advText : text
 
     return (
@@ -98,20 +100,21 @@ const InputField = ({
             : null,
           fullName: globalStore.currentUserData.currentUserFullName,
           text: textToSend,
+          data: data,
           replies: []
         }))
     )
   }
 
-  const handleSubmit = async (event: any, advText?: string) => {
+  const handleSubmit = async (event: any, advText?: string, data?: {name:string, email: string, message: string}) => {
     event.preventDefault()
     const createUuid = uuidv4()
     const replyUuid = uuidv4()
     mode === 'editMode'
-      ? editMode(advText)
+      ? editMode(advText, data)
       : mode === 'replyMode'
-      ? replyMode(replyUuid, advText)
-      : submitMode(createUuid, advText)
+      ? replyMode(replyUuid, advText, data)
+      : submitMode(createUuid, advText, data)
     setText('')
   }
 
@@ -132,7 +135,6 @@ const InputField = ({
         />
       ) : (
         <RegularInput
-          formStyle={formStyle}
           imgDiv={imgDiv}
           imgStyle={imgStyle}
           customImg={customImg}
@@ -142,8 +144,6 @@ const InputField = ({
           comId={comId}
           submitBtnStyle={submitBtnStyle}
           handleSubmit={handleSubmit}
-          text={text}
-          setText={setText}
         />
       )}
     </div>

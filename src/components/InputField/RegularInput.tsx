@@ -2,9 +2,7 @@ import React from 'react'
 import './InputField.scss'
 import { useContext } from 'react'
 import { GlobalContext } from '../../context/Provider'
-import { object, string } from "zod";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { Formik } from "formik";
 
 interface RegularInputProps {
   comId?: string
@@ -18,17 +16,30 @@ interface RegularInputProps {
   handleSubmit: Function
 }
 
-const contactFormSchema = object({
-  // defines a required field called name
-  name: string({
-    required_error: "Please enter your name",
-  }),
-  // defines a required field called email.
-  // we use the built-in email validator from zod
-  email: string().email("Please enter a valid email"),
-  // defines a required field called message with length constraints of 150-1000 characters.
-  message: string().min(5).max(350),
-});
+ // A custom validation function. This must return an object
+ // which keys are symmetrical to our values/initialValues
+ const validate = (values: { name: string | any[]; message: string | any[]; email: string; }) => {
+  var errors: {name?: string, message?: string, email?: string} = {};
+  if (!values.name || values.name === '') {
+    errors.name = 'Required';
+  } else if (values.name.length > 15) {
+    errors.name = 'Must be 15 characters or less';
+  }
+ 
+  if (!values.message || values.message === '') {
+    errors.message = 'Required';
+  } else if (values.message.length > 240) {
+    errors.message = 'Must be 240 characters or less';
+  }
+ 
+  if (!values.email || values.email === '') {
+    errors.email = 'Required';
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+ 
+  return errors;
+};
 
 const RegularInput = ({
   imgDiv,
@@ -50,14 +61,19 @@ const RegularInput = ({
           email: '',
           message: '',
         }}
+        initialErrors={{
+          name: 'Required',
+          email: 'Required',
+          message: 'Required',
+        }}
         onSubmit={(event, values) => {
           // Handle form submission here
           console.log(event);
           console.log(values);
         }}
-        validationSchema={toFormikValidationSchema(contactFormSchema)}
+        validate={validate}
       >
-        {() => (
+        {props => (
           <form>
             <div className='userImg' style={imgDiv}>
               <a
@@ -76,69 +92,80 @@ const RegularInput = ({
                 />
               </a>
             </div>
-            <Form>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Your name</span>
-                </label>
-                <Field
-                  type="text"
-                  name="name"
-                  placeholder="e.g. John Doe"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <ErrorMessage name="name" component="div" className="text-red-500" />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Your email</span>
-                </label>
-                <Field
-                  type="email"
-                  name="email"
-                  placeholder="e.g johndoe@gmail.com"
-                  className="input input-bordered w-full max-w-xs"
-                />
-                <ErrorMessage name="email" component="div" className="text-red-500" />
-              </div>
-              <div className="form-control">
-                <Field
-                  as="textarea"
-                  type="text"
-                  name="message"
-                  className='postComment textarea textarea-bordered h-2'
-                  style={
-                    mode === 'replyMode' || mode === 'editMode'
-                      ? globalStore.replyInputStyle
-                      : globalStore.inputStyle || inputStyle
-                  }
-                  placeholder='Type your reply here.'
-                />
-                <ErrorMessage name="message" component="div" className="text-red-500" />
-              </div>
-              {mode && (
-                <button
-                  className='cancelBtn'
-                  style={globalStore.cancelBtnStyle || cancelBtnStyle}
-                  type='button'
-                  onClick={() =>
-                    mode === 'editMode'
-                      ? globalStore.handleAction(comId, true)
-                      : globalStore.handleAction(comId, false)
-                  }
-                >
-                  Cancel
-                </button>
-              )}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Your name</span>
+              </label>
+              <input
+                type="text"
+                onChange={props.handleChange}
+                value={props.values.name}
+                onBlur={props.handleBlur}
+                name="name"
+                placeholder="e.g. John Doe"
+                className="input input-bordered w-full max-w-xs"
+              />
+              {props?.errors.name ? <div className="text-red-500">{props.errors.name}</div> : null}
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Your email</span>
+              </label>
+              <input
+                type="email"
+                onChange={props.handleChange}
+                value={props.values.email}
+                onBlur={props.handleBlur}
+                name="email"
+                placeholder="e.g johndoe@gmail.com"
+                className="input input-bordered w-full max-w-xs"
+              />
+              {props?.errors.email ? <div className="text-red-500">{props.errors.email}</div> : null}
+            </div>
+            <div className="form-control">
+              <input
+                type="text"
+                onChange={props.handleChange}
+                value={props.values.message}
+                onBlur={props.handleBlur}
+                name="message"
+                className='postComment textarea textarea-bordered h-2'
+                style={
+                  mode === 'replyMode' || mode === 'editMode'
+                    ? globalStore.replyInputStyle
+                    : globalStore.inputStyle || inputStyle
+                }
+                placeholder='Type your reply here.'
+              />
+              {props?.errors.message ? <div className="text-red-500">{props.errors.message}</div> : null}
+            </div>
+            {mode && (
               <button
-                className='postBtn'
-                type='submit'
-                style={globalStore.submitBtnStyle || submitBtnStyle}
-                onClick={(e)=>handleSubmit(e)}
+                className='cancelBtn'
+                style={globalStore.cancelBtnStyle || cancelBtnStyle}
+                type='button'
+                onClick={() =>
+                  mode === 'editMode'
+                    ? globalStore.handleAction(comId, true)
+                    : globalStore.handleAction(comId, false)
+                }
               >
-                Post
+                Cancel
               </button>
-            </Form>
+            )}
+            <button
+              className='postBtn'
+              type='submit'
+              style={globalStore.submitBtnStyle || submitBtnStyle}
+              onClick={(e)=>{
+                if (props.isValid) {
+                  handleSubmit(e, props.values.message, props.values);
+                }
+                e.preventDefault();
+              }}
+            >
+              Post
+            </button>
           </form>
         )}
       </Formik>
