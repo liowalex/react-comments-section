@@ -22,7 +22,7 @@ interface RegularInputProps {
   var errors: {name?: string, message?: string, email?: string} = {};
   if (!values.name || values.name === '') {
     errors.name = 'Required';
-  } else if (values.name.length > 15) {
+  } else if (values.name.length > 35) {
     errors.name = 'Must be 15 characters or less';
   }
  
@@ -46,10 +46,7 @@ const RegularInput = ({
   imgStyle,
   customImg,
   mode,
-  inputStyle,
-  cancelBtnStyle,
   comId,
-  submitBtnStyle,
   handleSubmit,
 }: RegularInputProps) => {
   const globalStore: any = useContext(GlobalContext)
@@ -66,11 +63,7 @@ const RegularInput = ({
           email: 'Required',
           message: 'Required',
         }}
-        onSubmit={(event, values) => {
-          // Handle form submission here
-          console.log(event);
-          console.log(values);
-        }}
+        onSubmit={()=>{}}
         validate={validate}
       >
         {props => (
@@ -88,61 +81,85 @@ const RegularInput = ({
                   }
                   style={globalStore.imgStyle || imgStyle}
                   alt='userIcon'
-                  className='imgdefault'
+                  className='imgdefault hidden'
                 />
               </a>
             </div>
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Your name</span>
-              </label>
+              <textarea
+                onChange={props.handleChange}
+                value={props.values.message}
+                onBlur={props.handleBlur}
+                name="message"
+                className='postComment textarea textarea-bordered h-2'
+                style={{
+                  textDecoration: "none",
+                  backgroundColor: "rgb(247, 248, 249)",
+                  borderColor: "rgb(240, 240, 240)",
+                  borderRadius: "1px",
+                  margin: "10px 0px 0px 0px",
+                  width: "100%",
+                  padding: "10px 15px",
+                  transition: "all 0s ease-in-out",
+                }}
+                placeholder='Comment *'
+              />
+              {props?.errors.message ? <div className="text-sm text-red-700">{props.errors.message}</div> : null}
+            </div>
+            <div className="form-control">
               <input
                 type="text"
                 onChange={props.handleChange}
                 value={props.values.name}
                 onBlur={props.handleBlur}
                 name="name"
-                placeholder="e.g. John Doe"
+                placeholder="Name *"
                 className="input input-bordered w-full max-w-xs"
+                style={{
+                  textDecoration: "none",
+                  backgroundColor: "rgb(247, 248, 249)",
+                  borderColor: "rgb(240, 240, 240)",
+                  borderRadius: "1px",
+                  margin: "10px 0px 0px 0px",
+                  width: "100%",
+                  padding: "10px 15px",
+                  transition: "all 0s ease-in-out",
+                }}
               />
-              {props?.errors.name ? <div className="text-red-500">{props.errors.name}</div> : null}
+              {props?.errors.name ? <div className="text-sm text-red-700">{props.errors.name}</div> : null}
             </div>
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Your email</span>
-              </label>
               <input
                 type="email"
                 onChange={props.handleChange}
                 value={props.values.email}
                 onBlur={props.handleBlur}
                 name="email"
-                placeholder="e.g johndoe@gmail.com"
+                placeholder="Email *"
                 className="input input-bordered w-full max-w-xs"
+                style={{
+                  textDecoration: "none",
+                  backgroundColor: "rgb(247, 248, 249)",
+                  borderColor: "rgb(240, 240, 240)",
+                  borderRadius: "1px",
+                  margin: "10px 0px 0px 0px",
+                  width: "100%",
+                  padding: "10px 15px",
+                  transition: "all 0s ease-in-out",
+                }}
               />
-              {props?.errors.email ? <div className="text-red-500">{props.errors.email}</div> : null}
-            </div>
-            <div className="form-control">
-              <input
-                type="text"
-                onChange={props.handleChange}
-                value={props.values.message}
-                onBlur={props.handleBlur}
-                name="message"
-                className='postComment textarea textarea-bordered h-2'
-                style={
-                  mode === 'replyMode' || mode === 'editMode'
-                    ? globalStore.replyInputStyle
-                    : globalStore.inputStyle || inputStyle
-                }
-                placeholder='Type your reply here.'
-              />
-              {props?.errors.message ? <div className="text-red-500">{props.errors.message}</div> : null}
+              {props?.errors.email ? <div className="text-sm text-red-700">{props.errors.email}</div> : null}
             </div>
             {mode && (
               <button
                 className='cancelBtn'
-                style={globalStore.cancelBtnStyle || cancelBtnStyle}
+                style={{
+                  marginTop: '5px',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  color: '#55555e',
+                  margin: '10px 20px 10px 0px',
+                }}
                 type='button'
                 onClick={() =>
                   mode === 'editMode'
@@ -156,12 +173,18 @@ const RegularInput = ({
             <button
               className='postBtn'
               type='submit'
-              style={globalStore.submitBtnStyle || submitBtnStyle}
               onClick={(e)=>{
                 if (props.isValid) {
                   handleSubmit(e, props.values.message, props.values);
                 }
                 e.preventDefault();
+              }}
+              style={{
+                marginTop: '5px',
+                backgroundColor: '#55555e',
+                cursor: 'pointer',
+                color: 'white',
+                padding: '10px 20px',
               }}
             >
               Post

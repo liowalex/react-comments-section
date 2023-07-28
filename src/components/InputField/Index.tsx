@@ -4,7 +4,6 @@ import { GlobalContext } from '../../context/Provider'
 import React from 'react'
 const { v4: uuidv4 } = require('uuid')
 import RegularInput from './RegularInput'
-import AdvancedInput from './AdvancedInput'
 
 interface InputFieldProps {
   formStyle?: object
@@ -21,7 +20,6 @@ interface InputFieldProps {
 }
 
 const InputField = ({
-  formStyle,
   comId,
   fillerText,
   parentId,
@@ -120,32 +118,17 @@ const InputField = ({
 
   return (
     <div>
-      {globalStore.advancedInput ? (
-        <AdvancedInput
-          handleSubmit={handleSubmit}
-          text={mode === 'editMode' ? text : ''}
-          formStyle={formStyle}
-          mode={mode}
-          cancelBtnStyle={cancelBtnStyle}
-          submitBtnStyle={submitBtnStyle}
-          comId={comId}
-          imgDiv={imgDiv}
-          imgStyle={imgStyle}
-          customImg={customImg}
-        />
-      ) : (
-        <RegularInput
-          imgDiv={imgDiv}
-          imgStyle={imgStyle}
-          customImg={customImg}
-          mode={mode}
-          inputStyle={inputStyle}
-          cancelBtnStyle={cancelBtnStyle}
-          comId={comId}
-          submitBtnStyle={submitBtnStyle}
-          handleSubmit={handleSubmit}
-        />
-      )}
+      <RegularInput
+        imgDiv={imgDiv}
+        imgStyle={imgStyle}
+        customImg={customImg}
+        mode={mode}
+        inputStyle={inputStyle}
+        cancelBtnStyle={cancelBtnStyle}
+        comId={comId}
+        submitBtnStyle={submitBtnStyle}
+        handleSubmit={handleSubmit}
+      />
     </div>
   )
 }
